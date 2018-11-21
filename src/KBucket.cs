@@ -18,14 +18,7 @@ namespace Makaretu.Collections
     {
         Bucket root = new Bucket();
         readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
-        byte[] localNodeId;
-
-        public KBucket()
-        {
-            // TODO: Allow as argument?
-            localNodeId = new byte[20];
-            new Random().NextBytes(localNodeId);
-        }
+        byte[] localContactId;
 
         /// <summary>
         ///   The number of contacts allowed in a bucket.
@@ -34,6 +27,28 @@ namespace Makaretu.Collections
         ///   This is the 'K' in KBucket.  Defaults to 20.
         /// </value>
         public int ContactsPerBucket { get; set; } = 20;
+
+        /// <summary>
+        ///   The ID of the local contact/peer.
+        /// </summary>
+        /// <value>
+        ///   Defaults to 20 random bytes.
+        /// </value>
+        public byte[] LocalContactId {
+            get
+            {
+                if (localContactId == null)
+                {
+                    localContactId = new byte[20];
+                    new Random().NextBytes(localContactId);
+                }
+                return localContactId;
+            }
+            set
+            {
+                localContactId = value;
+            }
+        }
 
         /// <summary>
         ///   Finds the XOR distance between the two contacts.
@@ -81,9 +96,8 @@ namespace Makaretu.Collections
                 .Select(a => a.contact);
         }
 
-#region ICollection
-    /// <inheritdoc />
-    public int Count => root.DeepCount();
+        /// <inheritdoc />
+        public int Count => root.DeepCount();
 
         /// <inheritdoc />
         public bool IsReadOnly => false;
@@ -168,7 +182,6 @@ namespace Makaretu.Collections
         {
             return GetEnumerator();
         }
-#endregion
 
         void _Add(IContact contact)
         {
@@ -239,7 +252,7 @@ namespace Makaretu.Collections
             // don't split the "far away" node
             // we check where the local node would end up and mark the other one as
             // "dontSplit" (i.e. "far away")
-            var detNode = _determineNode(node, localNodeId, bitIndex);
+            var detNode = _determineNode(node, LocalContactId, bitIndex);
             var otherNode = node.Left == detNode ? node.Right : node.Left;
             // TODO: otherNode.DontSplit = true;
         }
