@@ -24,7 +24,27 @@ namespace Makaretu.Collections
         /// </summary>
         public int Distance(IContact a, IContact b)
         {
-            throw new NotImplementedException();
+            return Distance(a.Id, b.Id);
+        }
+
+        /// <summary>
+        ///   Finds the XOR distance between the two contact IDs.
+        /// </summary>
+        public int Distance(byte[] a, byte[] b)
+        {
+            var distance = 0;
+            var i = 0;
+            var min = Math.Min(a.Length, b.Length);
+            var max = Math.Max(a.Length, b.Length);
+            for (; i < min; ++i)
+            {
+                distance = distance * 256 + (a[i] ^ b[i]);
+            }
+            for (; i < max; ++i)
+            {
+                distance = distance * 256 + 255;
+            }
+            return distance;
         }
 
         /// <summary>
