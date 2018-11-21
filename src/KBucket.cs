@@ -152,8 +152,7 @@ namespace Makaretu.Collections
             rwlock.EnterWriteLock();
             try
             {
-                // TODO
-                throw new NotImplementedException();
+                return _remove(item.Id);
             }
             finally
             {
@@ -310,6 +309,27 @@ namespace Makaretu.Collections
 
             // index of uses contact id for matching
             return node.Get(id);
+        }
+
+        bool _remove(byte[] id)
+        {
+            var bitIndex = 0;
+
+            var node = root;
+            while (node.Contacts == null)
+            {
+                node = _determineNode(node, id, bitIndex++);
+            }
+
+            // index of uses contact id for matching
+            var index = node.IndexOf(id);
+            if (0 <= index)
+            {
+                node.Contacts.RemoveAt(index);
+                return true;
+            }
+
+            return false;
         }
 
     }

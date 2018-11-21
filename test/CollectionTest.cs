@@ -101,6 +101,10 @@ namespace Makaretu.Collections
 
             bucket.Remove(new Contact("b"));
             Assert.AreEqual(2, bucket.Count);
+
+            Assert.IsTrue(bucket.Contains(new Contact("a")));
+            Assert.IsFalse(bucket.Contains(new Contact("b")));
+            Assert.IsTrue(bucket.Contains(new Contact("c")));
         }
 
         [TestMethod]

@@ -27,7 +27,14 @@ namespace Makaretu.Collections
 
         public IContact Get(byte[] id)
         {
-            return Contacts?.First(c => c.Id.SequenceEqual(id));
+            return Contacts?.FirstOrDefault(c => c.Id.SequenceEqual(id));
+        }
+
+        public int IndexOf(byte[] id)
+        {
+            if (Contacts == null)
+                return -1;
+            return Contacts.FindIndex(c => c.Id.SequenceEqual(id));
         }
 
         public int DeepCount()
