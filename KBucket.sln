@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KBucket", "src\KBucket.csproj", "{20BB4493-BAD0-45BE-87A1-1F1E5193541C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KBucketTests", "test\KBucketTests.csproj", "{BD6A7E71-C821-4EA3-A9C2-119788252AEE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20BB4493-BAD0-45BE-87A1-1F1E5193541C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20BB4493-BAD0-45BE-87A1-1F1E5193541C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20BB4493-BAD0-45BE-87A1-1F1E5193541C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20BB4493-BAD0-45BE-87A1-1F1E5193541C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD6A7E71-C821-4EA3-A9C2-119788252AEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD6A7E71-C821-4EA3-A9C2-119788252AEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD6A7E71-C821-4EA3-A9C2-119788252AEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD6A7E71-C821-4EA3-A9C2-119788252AEE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F12D3A2A-7C40-48AF-BEE0-94EB0F788C83}
+	EndGlobalSection
+EndGlobal
