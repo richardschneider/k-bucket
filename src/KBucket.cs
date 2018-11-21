@@ -73,12 +73,15 @@ namespace Makaretu.Collections
         /// <remarks>
         ///   "Closest" is the XOR metric of the contact.
         /// </remarks>
-        public IEnumerable<IContact> FindClosest(IContact contact)
+        public IEnumerable<IContact> Closest(IContact contact)
         {
-            throw new NotImplementedException();
+            return this
+                .Select(c => new { distance = Distance(c.Id, contact.Id), contact = c })
+                .OrderBy(a => a.distance)
+                .Select(a => a.contact);
         }
 
-        #region ICollection
+#region ICollection
     /// <inheritdoc />
     public int Count => root.DeepCount();
 
@@ -165,7 +168,7 @@ namespace Makaretu.Collections
         {
             return GetEnumerator();
         }
-        #endregion
+#endregion
 
         void _Add(IContact contact)
         {

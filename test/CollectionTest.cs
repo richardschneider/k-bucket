@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Makaretu.Collections
 {
-    class Contact : IContact
+    public class Contact : IContact
     {
         public Contact(string id)
         {
@@ -23,6 +23,11 @@ namespace Makaretu.Collections
         public Contact(int id)
             : this(id.ToString(CultureInfo.InvariantCulture))
         {
+        }
+
+        public Contact(params byte[] bytes)
+        {
+            Id = bytes;
         }
 
         public byte[]Id { get; set; }
