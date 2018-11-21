@@ -9,12 +9,12 @@ namespace Makaretu.Collections
     /// <summary>
     ///   A node in the <see cref="KBucket"/>.
     /// </summary>
-    class Node
+    class Bucket
     {
         public List<IContact> Contacts = new List<IContact>();
         public bool DontSplit;
-        public Node Left;
-        public Node Right;
+        public Bucket Left;
+        public Bucket Right;
 
         public int DeepCount()
         {

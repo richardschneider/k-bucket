@@ -16,8 +16,16 @@ namespace Makaretu.Collections
     /// </remarks>
     public class KBucket : ICollection<IContact>
     {
-        Node root = new Node();
+        Bucket root = new Bucket();
         readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
+
+        /// <summary>
+        ///   The number of contacts allowed in a bucket.
+        /// </summary>
+        /// <value>
+        ///   This is the 'K' in KBucket.  Defaults to 20.
+        /// </value>
+        public int ContactsPerBucket { get; set; } = 20;
 
         /// <summary>
         ///   Finds the XOR distance between the two contacts.
@@ -87,7 +95,7 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public void Clear()
         {
-            root = new Node();
+            root = new Bucket();
         }
 
         /// <inheritdoc />
@@ -108,17 +116,9 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public void CopyTo(IContact[] array, int arrayIndex)
         {
-            rwlock.EnterReadLock();
-            try
+            foreach (var contact in this)
             {
-                foreach (var contact in this)
-                {
-                    array[arrayIndex++] = contact;
-                }
-            }
-            finally
-            {
-                rwlock.ExitReadLock();
+                array[arrayIndex++] = contact;
             }
         }
 
