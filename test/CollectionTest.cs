@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -12,12 +13,16 @@ namespace Makaretu.Collections
     {
         public Contact(string id)
         {
-            Id = Encoding.UTF8.GetBytes(id);
+            var key = Encoding.UTF8.GetBytes(id);
+            using (var hasher = SHA1.Create())
+            {
+                Id = hasher.ComputeHash(key);
+            }
         }
 
         public Contact(int id)
+            : this(id.ToString(CultureInfo.InvariantCulture))
         {
-            Id = Encoding.UTF8.GetBytes(id.ToString(CultureInfo.InvariantCulture));
         }
 
         public byte[]Id { get; set; }
@@ -122,7 +127,7 @@ namespace Makaretu.Collections
         public void Enumerate()
         {
             var bucket = new KBucket();
-            var nContacts = 40;
+            var nContacts = 4000;
             for (var i = 0; i < nContacts; ++i)
             {
                 bucket.Add(new Contact(i));
@@ -134,7 +139,7 @@ namespace Makaretu.Collections
             {
                 ++n;
             }
-            Assert.AreEqual(n, nContacts);
+            Assert.AreEqual(nContacts, n);
         }
 
         [TestMethod]
@@ -153,8 +158,8 @@ namespace Makaretu.Collections
 
             for (var i = 0; i < nTasks; ++i)
             {
-                tasks[i] = new Task(() => AddTask(bucket, i, nContacts));
-                tasks[i].Start();
+                var start = i;
+                tasks[i] = Task.Run(() => AddTask(bucket, start, nContacts));
             }
             await Task.WhenAll(tasks);
 
@@ -165,7 +170,7 @@ namespace Makaretu.Collections
         {
             for (var i = 0; i < count; ++i)
             {
-                bucket.Add(new Contact(start + i));
+                bucket.Add(new Contact(start * count + i));
             }
         }
     }

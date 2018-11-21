@@ -18,6 +18,14 @@ namespace Makaretu.Collections
     {
         Bucket root = new Bucket();
         readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
+        byte[] localNodeId;
+
+        public KBucket()
+        {
+            // TODO: Allow as argument?
+            localNodeId = new byte[20];
+            new Random().NextBytes(localNodeId);
+        }
 
         /// <summary>
         ///   The number of contacts allowed in a bucket.
@@ -71,8 +79,8 @@ namespace Makaretu.Collections
         }
 
         #region ICollection
-        /// <inheritdoc />
-        public int Count => root.DeepCount();
+    /// <inheritdoc />
+    public int Count => root.DeepCount();
 
         /// <inheritdoc />
         public bool IsReadOnly => false;
@@ -80,11 +88,11 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public void Add(IContact item)
         {
+            // TODO: Argument checks
             rwlock.EnterWriteLock();
             try
             {
-                // TODO
-                root.Contacts.Add(item);
+                _Add(item);
             }
             finally
             {
@@ -104,8 +112,7 @@ namespace Makaretu.Collections
             rwlock.EnterReadLock();
             try
             {
-                // TODO
-                throw new NotImplementedException();
+                return _get(item.Id) != null;
             }
             finally
             {
@@ -160,5 +167,150 @@ namespace Makaretu.Collections
             return GetEnumerator();
         }
         #endregion
+
+        void _Add(IContact contact)
+        {
+            var bitIndex = 0;
+            var node = root;
+
+            while (node.Contacts == null)
+            {
+                // this is not a leaf node but an inner node with 'low' and 'high'
+                // branches; we will check the appropriate bit of the identifier and
+                // delegate to the appropriate node for further processing
+                node = _determineNode(node, contact.Id, bitIndex++);
+            }
+
+            // check if the contact already exists
+            if (node.Contains(contact))
+            {
+                _update(node, contact);
+                return;
+            }
+
+            if (node.Contacts.Count < ContactsPerBucket)
+            {
+                node.Contacts.Add(contact);
+                return;
+            }
+
+            // the bucket is full
+            if (node.DontSplit)
+            {
+                // we are not allowed to split the bucket
+                // we need to ping the first this.numberOfNodesToPing
+                // in order to determine if they are alive
+                // only if one of the pinged nodes does not respond, can the new contact
+                // be added (this prevents DoS flodding with new invalid contacts)
+
+                // TODO: this.emit('ping', node.contacts.slice(0, this.numberOfNodesToPing), contact)
+                return;
+            }
+
+            _split(node, bitIndex);
+            _Add(contact);
+        }
+
+        /**
+           * Splits the node, redistributes contacts to the new nodes, and marks the
+           * node that was split as an inner node of the binary tree of nodes by
+           * setting this.root.contacts = null
+           *
+           * @param  {Object} node     node for splitting
+           * @param  {Number} bitIndex the bitIndex to which byte to check in the
+           *                           Uint8Array for navigating the binary tree
+           */
+        void _split(Bucket node, int bitIndex)
+        {
+            node.Left = new Bucket();
+            node.Right = new Bucket();
+
+            // redistribute existing contacts amongst the two newly created nodes
+            foreach (var contact in node.Contacts)
+            {
+                _determineNode(node, contact.Id, bitIndex)
+                    .Contacts.Add(contact);
+            }
+
+            node.Contacts = null; // mark as inner tree node
+
+            // don't split the "far away" node
+            // we check where the local node would end up and mark the other one as
+            // "dontSplit" (i.e. "far away")
+            var detNode = _determineNode(node, localNodeId, bitIndex);
+            var otherNode = node.Left == detNode ? node.Right : node.Left;
+            // TODO: otherNode.DontSplit = true;
+        }
+
+        private void _update(Bucket node, IContact contact)
+        {
+            // TODO
+        }
+
+        /// <summary>
+        ///   Determines whether the id at the bitIndex is 0 or 1.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="id"></param>
+        /// <param name="bitIndex"></param>
+        /// <returns>
+        ///   Left leaf if `id` at `bitIndex` is 0, right leaf otherwise
+        /// </returns>
+        Bucket _determineNode(Bucket node, byte[]id, int bitIndex)
+        {
+
+            // id's that are too short are put in low bucket (1 byte = 8 bits)
+            // (bitIndex >> 3) finds how many bytes the bitIndex describes
+            // bitIndex % 8 checks if we have extra bits beyond byte multiples
+            // if number of bytes is <= no. of bytes described by bitIndex and there
+            // are extra bits to consider, this means id has less bits than what
+            // bitIndex describes, id therefore is too short, and will be put in low
+            // bucket
+            var bytesDescribedByBitIndex = bitIndex >> 3;
+            var bitIndexWithinByte = bitIndex % 8;
+            if ((id.Length <= bytesDescribedByBitIndex) && (bitIndexWithinByte != 0))
+            {
+                return node.Left;
+            }
+
+            // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
+            // where 255 is 11111111 and 0 is 00000000
+            // in order to find out whether the bit at bitIndexWithinByte is set
+            // we construct (1 << (7 - bitIndexWithinByte)) which will consist
+            // of all bits being 0, with only one bit set to 1
+            // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
+            // (1 << (7 - 3)) -> (1 << 4) -> 16
+            var byteUnderConsideration = id[bytesDescribedByBitIndex];
+            if (0 != (byteUnderConsideration & (1 << (7 - bitIndexWithinByte))))
+            {
+                return node.Right;
+            }
+
+            return node.Left;
+        }
+
+        /**
+   * Get a contact by its exact ID.
+   * If this is a leaf, loop through the bucket contents and return the correct
+   * contact if we have it or null if not. If this is an inner node, determine
+   * which branch of the tree to traverse and repeat.
+   *
+   * @param  {Uint8Array} id The ID of the contact to fetch.
+   * @return {Object|Null}   The contact if available, otherwise null
+   */
+        IContact _get(byte[] id)
+        {
+            var bitIndex = 0;
+
+            var node = root;
+            while (node.Contacts == null)
+            {
+                node = _determineNode(node, id, bitIndex++);
+            }
+
+            // index of uses contact id for matching
+            return node.Get(id);
+        }
+
     }
 }
