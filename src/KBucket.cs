@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Makaretu.Collections
@@ -10,12 +11,16 @@ namespace Makaretu.Collections
     /// <summary>
     ///   Implementation of a Kademlia DHT k-bucket used for storing contact (peer node) information.
     /// </summary>
+    /// <remarks>
+    ///   All public methods and properties are thead-safe.
+    /// </remarks>
     public class KBucket : ICollection<IContact>
     {
         Node root = new Node();
+        readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
 
         /// <summary>
-        ///    Finds the XOR distance between the two contacts.
+        ///   Finds the XOR distance between the two contacts.
         /// </summary>
         public int Distance(IContact a, IContact b)
         {
@@ -47,8 +52,16 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public void Add(IContact item)
         {
-            // TODO
-            root.Contacts.Add(item);
+            rwlock.EnterWriteLock();
+            try
+            {
+                // TODO
+                root.Contacts.Add(item);
+            }
+            finally
+            {
+                rwlock.ExitWriteLock();
+            }
         }
 
         /// <inheritdoc />
@@ -60,31 +73,65 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public bool Contains(IContact item)
         {
-            throw new NotImplementedException();
+            rwlock.EnterReadLock();
+            try
+            {
+                // TODO
+                throw new NotImplementedException();
+            }
+            finally
+            {
+                rwlock.ExitReadLock();
+            }
         }
 
         /// <inheritdoc />
         public void CopyTo(IContact[] array, int arrayIndex)
         {
-            foreach (var contact in this)
+            rwlock.EnterReadLock();
+            try
             {
-                array[arrayIndex++] = contact;
+                foreach (var contact in this)
+                {
+                    array[arrayIndex++] = contact;
+                }
+            }
+            finally
+            {
+                rwlock.ExitReadLock();
             }
         }
 
         /// <inheritdoc />
         public IEnumerator<IContact> GetEnumerator()
         {
-            foreach (var contact in root.AllContacts())
+            rwlock.EnterReadLock();
+            try
             {
-                yield return contact;
+                foreach (var contact in root.AllContacts())
+                {
+                    yield return contact;
+                }
+            }
+            finally
+            {
+                rwlock.ExitReadLock();
             }
         }
 
         /// <inheritdoc />
         public bool Remove(IContact item)
         {
-            throw new NotImplementedException();
+            rwlock.EnterWriteLock();
+            try
+            {
+                // TODO
+                throw new NotImplementedException();
+            }
+            finally
+            {
+                rwlock.ExitWriteLock();
+            }
         }
 
         /// <inheritdoc />

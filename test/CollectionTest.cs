@@ -142,5 +142,31 @@ namespace Makaretu.Collections
         {
             Assert.IsFalse(new KBucket().IsReadOnly);
         }
+
+        [TestMethod]
+        public async Task ThreadSafe()
+        {
+            var bucket = new KBucket();
+            var nContacts = 1000;
+            var nTasks = 100;
+            var tasks = new Task[nTasks];
+
+            for (var i = 0; i < nTasks; ++i)
+            {
+                tasks[i] = new Task(() => AddTask(bucket, i, nContacts));
+                tasks[i].Start();
+            }
+            await Task.WhenAll(tasks);
+
+            Assert.AreEqual(nTasks * nContacts, bucket.Count);
+        }
+
+        public void AddTask(KBucket bucket, int start, int count)
+        {
+            for (var i = 0; i < count; ++i)
+            {
+                bucket.Add(new Contact(start + i));
+            }
+        }
     }
 }
