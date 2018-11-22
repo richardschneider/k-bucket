@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard14;netstandard2</TargetFrameworks>
     <AssemblyName>Makaretu.KBucket</AssemblyName>
     <RootNamespace>Makaretu.Collections</RootNamespace>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
