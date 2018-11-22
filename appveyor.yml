@@ -32,8 +32,8 @@ environment:
 # tools we need for bulding/testing/deploying
 install:
    - choco install gitversion.portable -y
-   - choco install docfx -y
-   - npm install gh-pages -g
+#   - choco install docfx -y
+#   - npm install gh-pages -g
 
 # gitversion will change the assembly info
 pull_requests:
@@ -48,7 +48,7 @@ build_script:
   - dotnet pack -c %CONFIGURATION% --no-build --no-restore -p:Version=%GitVersion_MajorMinorPatch% -p:AssemblyVersion=%GitVersion_MajorMinorPatch%
 
 after_build:
-  - cmd: appveyor PushArtifact "src\bin\%CONFIGURATION%\Makaretu.Dns.%GitVersion_MajorMinorPatch%.nupkg"
+  - cmd: appveyor PushArtifact "src\bin\%CONFIGURATION%\Makaretu.KBucket.%GitVersion_MajorMinorPatch%.nupkg"
 
 test_script:
   - dotnet test -c %CONFIGURATION% --no-build --no-restore test
@@ -56,7 +56,7 @@ test_script:
 after_test: 
 # Generate coverage report
     - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe 
-        -register:user -filter:"+[Makaretu.Dns*]* -[*Tests]*" 
+        -register:user -filter:"+[Makaretu.KBucket*]* -[*Tests]*" 
         -target:"c:\Program Files\dotnet\dotnet.exe" 
         -targetargs:"test -c Release --no-build --no-restore --framework net45 test" 
         -output:coverage.xml  
@@ -67,11 +67,11 @@ after_test:
         packages\coveralls.net.0.6.0\tools\csmacnz.coveralls.exe 
         --opencover -i ./coverage.xml --useRelativePaths --serviceName appveyor --jobId %APPVEYOR_BUILD_NUMBER%
 # Build documentation in doc\_site
-    - del src\obj\*.* /s /q
-    - docfx doc\docfx.json --logLevel Warning
-    - 7z a -tzip docs.zip doc\_site
-    - appveyor PushArtifact docs.zip
-    - if defined git_token gh-pages -d doc\_site -m "new docs %GitVersion_FullSemVer%"
+#    - del src\obj\*.* /s /q
+#    - docfx doc\docfx.json --logLevel Warning
+#   - 7z a -tzip docs.zip doc\_site
+#    - appveyor PushArtifact docs.zip
+#    - if defined git_token gh-pages -d doc\_site -m "new docs %GitVersion_FullSemVer%"
 
 # publish NuGet package on tag build
 nuget:
