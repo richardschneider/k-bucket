@@ -17,12 +17,12 @@
     <Title>Kademlia DHT K-bucket</Title>
     <Description>Kademlia DHT K-bucket C# implementation as a binary tree.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>https://github.com/richardschneider/KBucket/releases</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/richardschneider/k-bucket/releases</PackageReleaseNotes>
     <Copyright>© 2018 Richard Schneider</Copyright>
     <PackageTags>kademlia DHT distributed k-bucket</PackageTags>
     <IncludeSymbols>True</IncludeSymbols>
-    <PackageLicenseUrl>https://github.com/richardschneider/KBucket/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/richardschneider/KBucket</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/richardschneider/k-bucket/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/richardschneider/k-bucket</PackageProjectUrl>
   </PropertyGroup>
 
   
