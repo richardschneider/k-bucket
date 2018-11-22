@@ -1,38 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Makaretu.Collections
 {
-    public class Contact : IContact
-    {
-        public Contact(string id)
-        {
-            var key = Encoding.UTF8.GetBytes(id);
-            using (var hasher = SHA1.Create())
-            {
-                Id = hasher.ComputeHash(key);
-            }
-        }
-
-        public Contact(int id)
-            : this(id.ToString(CultureInfo.InvariantCulture))
-        {
-        }
-
-        public Contact(params byte[] bytes)
-        {
-            Id = bytes;
-        }
-
-        public byte[]Id { get; set; }
-
-    }
     [TestClass]
     public class CollectionTest
     {
@@ -55,6 +29,15 @@ namespace Makaretu.Collections
             bucket.Add(x);
             Assert.AreEqual(1, bucket.Count);
             Assert.IsTrue(bucket.Contains(x));
+        }
+
+        [TestMethod]
+        public void AddBadContact()
+        {
+            var bucket = new KBucket();
+            ExceptionAssert.Throws<ArgumentNullException>(() => bucket.Add(null));
+            ExceptionAssert.Throws<ArgumentNullException>(() => bucket.Add(new Contact("a") { Id = null }));
+            ExceptionAssert.Throws<ArgumentNullException>(() => bucket.Add(new Contact("a") { Id = new byte[0] }));
         }
 
         [TestMethod]

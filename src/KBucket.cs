@@ -55,6 +55,8 @@ namespace Makaretu.Collections
         /// </summary>
         public int Distance(IContact a, IContact b)
         {
+            Validate(a);
+            Validate(b);
             return Distance(a.Id, b.Id);
         }
 
@@ -90,6 +92,7 @@ namespace Makaretu.Collections
         /// </remarks>
         public IEnumerable<IContact> Closest(IContact contact)
         {
+            Validate(contact);
             return this
                 .Select(c => new { distance = Distance(c.Id, contact.Id), contact = c })
                 .OrderBy(a => a.distance)
@@ -105,7 +108,8 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public void Add(IContact item)
         {
-            // TODO: Argument checks
+            Validate(item);
+
             rwlock.EnterWriteLock();
             try
             {
@@ -126,6 +130,8 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public bool Contains(IContact item)
         {
+            Validate(item);
+
             rwlock.EnterReadLock();
             try
             {
@@ -166,6 +172,8 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public bool Remove(IContact item)
         {
+            Validate(item);
+
             rwlock.EnterWriteLock();
             try
             {
@@ -181,6 +189,14 @@ namespace Makaretu.Collections
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        void Validate(IContact contact)
+        {
+            if (contact == null)
+                throw new ArgumentNullException("contact");
+            if (contact.Id == null || contact.Id.Length == 0)
+                throw new ArgumentNullException("contact.Id");
         }
 
         void _Add(IContact contact)
