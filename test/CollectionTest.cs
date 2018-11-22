@@ -41,6 +41,23 @@ namespace Makaretu.Collections
         }
 
         [TestMethod]
+        public void TryGet()
+        {
+            var bucket = new KBucket();
+            var alpha = new Contact("alpha");
+            var beta = new Contact("beta");
+            bucket.Add(alpha);
+
+            var q = bucket.TryGet(alpha.Id, out IContact found);
+            Assert.IsTrue(q);
+            Assert.AreSame(alpha, found);
+
+            q = bucket.TryGet(beta.Id, out IContact notfound);
+            Assert.IsFalse(q);
+            Assert.IsNull(notfound);
+        }
+
+        [TestMethod]
         public void Count()
         {
             var bucket = new KBucket();

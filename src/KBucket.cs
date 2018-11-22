@@ -143,6 +143,34 @@ namespace Makaretu.Collections
             }
         }
 
+        /// <summary>
+        ///   Gets the contact associated with the specified ID.
+        /// </summary>
+        /// <param name="id">
+        ///   The ID of an <see cref="IContact"/>.
+        /// </param>
+        /// <param name="contact">
+        ///   When this method returns, contains the <see cref="IContact"/> associated 
+        ///   with the <paramref name="id"/>, if the key is found; otherwise, <b>null</b>.
+        ///   This parameter is passed uninitialized.
+        /// </param>
+        /// <returns>
+        ///  <b>true</b> if the <paramref name="id"/> is found; otherwise <b>false</b>.
+        /// </returns>
+        public bool TryGet(byte[] id, out IContact contact)
+        {
+            rwlock.EnterReadLock();
+            try
+            {
+                contact =_Get(id);
+                return contact != null;
+            }
+            finally
+            {
+                rwlock.ExitReadLock();
+            }
+        }
+
         /// <inheritdoc />
         public void CopyTo(IContact[] array, int arrayIndex)
         {
