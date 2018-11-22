@@ -93,8 +93,25 @@ namespace Makaretu.Collections
         public IEnumerable<IContact> Closest(IContact contact)
         {
             Validate(contact);
+            return Closest(contact.Id);
+        }
+
+        /// <summary>
+        ///   Gets the closest contacts to the provided contact.
+        /// </summary>
+        /// <param name="id">
+        ///   The unique <see cref="IContact.Id"/> of a contact.
+        /// </param>
+        /// <returns>
+        ///   An ordered sequence of contact, sorted by closeness. 
+        /// </returns>
+        /// <remarks>
+        ///   "Closest" is the XOR metric of the contact.
+        /// </remarks>
+        public IEnumerable<IContact> Closest(byte[] id)
+        { 
             return this
-                .Select(c => new { distance = Distance(c.Id, contact.Id), contact = c })
+                .Select(c => new { distance = Distance(c.Id, id), contact = c })
                 .OrderBy(a => a.distance)
                 .Select(a => a.contact);
         }
