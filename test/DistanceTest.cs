@@ -17,7 +17,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void Tristanls()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
 
             Assert.AreEqual(0, bucket.Distance(new byte[] { 0x00 }, new byte[] { 0x00 }));
             Assert.AreEqual(1, bucket.Distance(new byte[] { 0x00 }, new byte[] { 0x01 }));

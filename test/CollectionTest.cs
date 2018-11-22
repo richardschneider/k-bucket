@@ -13,7 +13,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void Add()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             var x = new Contact("1");
             bucket.Add(x);
             Assert.AreEqual(1, bucket.Count);
@@ -23,7 +23,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void AddDuplicate()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             var x = new Contact("1");
             bucket.Add(x);
             bucket.Add(x);
@@ -34,7 +34,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void AddBadContact()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             ExceptionAssert.Throws<ArgumentNullException>(() => bucket.Add(null));
             ExceptionAssert.Throws<ArgumentNullException>(() => bucket.Add(new Contact("a") { Id = null }));
             ExceptionAssert.Throws<ArgumentNullException>(() => bucket.Add(new Contact("a") { Id = new byte[0] }));
@@ -43,16 +43,16 @@ namespace Makaretu.Collections
         [TestMethod]
         public void TryGet()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             var alpha = new Contact("alpha");
             var beta = new Contact("beta");
             bucket.Add(alpha);
 
-            var q = bucket.TryGet(alpha.Id, out IContact found);
+            var q = bucket.TryGet(alpha.Id, out Contact found);
             Assert.IsTrue(q);
             Assert.AreSame(alpha, found);
 
-            q = bucket.TryGet(beta.Id, out IContact notfound);
+            q = bucket.TryGet(beta.Id, out Contact notfound);
             Assert.IsFalse(q);
             Assert.IsNull(notfound);
         }
@@ -60,7 +60,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void Count()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             Assert.AreEqual(0, bucket.Count);
 
             bucket.Add(new Contact("a"));
@@ -81,7 +81,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void Clear()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             Assert.AreEqual(0, bucket.Count);
 
             bucket.Add(new Contact("a"));
@@ -96,7 +96,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void Remove()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             Assert.AreEqual(0, bucket.Count);
 
             bucket.Add(new Contact("a"));
@@ -115,7 +115,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void CopyTo()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             Assert.AreEqual(0, bucket.Count);
 
             bucket.Add(new Contact("a"));
@@ -135,7 +135,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void Enumerate()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             var nContacts = 4000;
             for (var i = 0; i < nContacts; ++i)
             {
@@ -154,13 +154,13 @@ namespace Makaretu.Collections
         [TestMethod]
         public void CanBeModified()
         {
-            Assert.IsFalse(new KBucket().IsReadOnly);
+            Assert.IsFalse(new KBucket<Contact>().IsReadOnly);
         }
 
         [TestMethod]
         public async Task ThreadSafe()
         {
-            var bucket = new KBucket();
+            var bucket = new KBucket<Contact>();
             var nContacts = 1000;
             var nTasks = 100;
             var tasks = new Task[nTasks];
@@ -175,7 +175,7 @@ namespace Makaretu.Collections
             Assert.AreEqual(nTasks * nContacts, bucket.Count);
         }
 
-        public void AddTask(KBucket bucket, int start, int count)
+        public void AddTask(KBucket<Contact> bucket, int start, int count)
         {
             for (var i = 0; i < count; ++i)
             {

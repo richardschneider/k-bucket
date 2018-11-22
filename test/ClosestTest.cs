@@ -17,7 +17,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void ClosestNodes()
         {
-            var kBucket = new KBucket();
+            var kBucket = new KBucket<Contact>();
             for (var i = 0; i < 0x12; ++i)
             {
                 kBucket.Add(new Contact((byte)i));
@@ -32,7 +32,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void All()
         {
-            var kBucket = new KBucket();
+            var kBucket = new KBucket<Contact>();
             for (var i = 0; i < 100; ++i)
             {
                 kBucket.Add(new Contact((byte)(i / 256), (byte)(i % 256)));
@@ -45,7 +45,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void ClosestNodes_ExactMatch()
         {
-            var kBucket = new KBucket();
+            var kBucket = new KBucket<Contact>();
             for (var i = 0; i < 0x12; ++i)
             {
                 kBucket.Add(new Contact((byte)i));
@@ -60,7 +60,7 @@ namespace Makaretu.Collections
         [TestMethod]
         public void ClosestNodes_PartialBuckets()
         {
-            var kBucket = new KBucket();
+            var kBucket = new KBucket<Contact>();
             for (var i = 0; i < kBucket.ContactsPerBucket; ++i)
             {
                 kBucket.Add(new Contact((byte)0x80, (byte)i));

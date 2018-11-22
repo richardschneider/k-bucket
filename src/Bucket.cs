@@ -7,16 +7,17 @@ using System.Threading.Tasks;
 namespace Makaretu.Collections
 {
     /// <summary>
-    ///   A node in the <see cref="KBucket"/>.
+    ///   A node in the <see cref="KBucket{T}"/>.
     /// </summary>
-    class Bucket
+    class Bucket<T>
+        where T: class, IContact
     {
-        public List<IContact> Contacts = new List<IContact>();
+        public List<T> Contacts = new List<T>();
         public bool DontSplit;
-        public Bucket Left;
-        public Bucket Right;
+        public Bucket<T> Left;
+        public Bucket<T> Right;
 
-        public bool Contains(IContact item)
+        public bool Contains(T item)
         {
             if (Contacts == null)
             {
@@ -25,7 +26,7 @@ namespace Makaretu.Collections
             return Contacts.Any(c => c.Id.SequenceEqual(item.Id));
         }
 
-        public IContact Get(byte[] id)
+        public T Get(byte[] id)
         {
             return Contacts?.FirstOrDefault(c => c.Id.SequenceEqual(id));
         }
@@ -50,7 +51,7 @@ namespace Makaretu.Collections
             return n;
         }
 
-        public IEnumerable<IContact> AllContacts()
+        public IEnumerable<T> AllContacts()
         {
             if (Contacts != null)
             {

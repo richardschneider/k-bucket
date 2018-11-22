@@ -11,12 +11,16 @@ namespace Makaretu.Collections
     /// <summary>
     ///   Implementation of a Kademlia DHT k-bucket used for storing contact (peer node) information.
     /// </summary>
+    /// <typeparam name="T">
+    ///   A contact type that implements <see cref="IContact"/> .
+    /// </typeparam>
     /// <remarks>
     ///   All public methods and properties are thead-safe.
     /// </remarks>
-    public class KBucket : ICollection<IContact>
+    public class KBucket<T> : ICollection<T>
+        where T: class, IContact
     {
-        Bucket root = new Bucket();
+        Bucket<T> root = new Bucket<T>();
         readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         byte[] localContactId;
 
@@ -53,7 +57,7 @@ namespace Makaretu.Collections
         /// <summary>
         ///   Finds the XOR distance between the two contacts.
         /// </summary>
-        public int Distance(IContact a, IContact b)
+        public int Distance(T a, T b)
         {
             Validate(a);
             Validate(b);
@@ -90,7 +94,7 @@ namespace Makaretu.Collections
         /// <remarks>
         ///   "Closest" is the XOR metric of the contact.
         /// </remarks>
-        public IEnumerable<IContact> Closest(IContact contact)
+        public IEnumerable<T> Closest(T contact)
         {
             Validate(contact);
             return Closest(contact.Id);
@@ -108,7 +112,7 @@ namespace Makaretu.Collections
         /// <remarks>
         ///   "Closest" is the XOR metric of the contact.
         /// </remarks>
-        public IEnumerable<IContact> Closest(byte[] id)
+        public IEnumerable<T> Closest(byte[] id)
         { 
             return this
                 .Select(c => new { distance = Distance(c.Id, id), contact = c })
@@ -123,7 +127,7 @@ namespace Makaretu.Collections
         public bool IsReadOnly => false;
 
         /// <inheritdoc />
-        public void Add(IContact item)
+        public void Add(T item)
         {
             Validate(item);
 
@@ -141,11 +145,11 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public void Clear()
         {
-            root = new Bucket();
+            root = new Bucket<T>();
         }
 
         /// <inheritdoc />
-        public bool Contains(IContact item)
+        public bool Contains(T item)
         {
             Validate(item);
 
@@ -174,7 +178,7 @@ namespace Makaretu.Collections
         /// <returns>
         ///  <b>true</b> if the <paramref name="id"/> is found; otherwise <b>false</b>.
         /// </returns>
-        public bool TryGet(byte[] id, out IContact contact)
+        public bool TryGet(byte[] id, out T contact)
         {
             rwlock.EnterReadLock();
             try
@@ -189,7 +193,7 @@ namespace Makaretu.Collections
         }
 
         /// <inheritdoc />
-        public void CopyTo(IContact[] array, int arrayIndex)
+        public void CopyTo(T[] array, int arrayIndex)
         {
             foreach (var contact in this)
             {
@@ -198,7 +202,7 @@ namespace Makaretu.Collections
         }
 
         /// <inheritdoc />
-        public IEnumerator<IContact> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             rwlock.EnterReadLock();
             try
@@ -215,7 +219,7 @@ namespace Makaretu.Collections
         }
 
         /// <inheritdoc />
-        public bool Remove(IContact item)
+        public bool Remove(T item)
         {
             Validate(item);
 
@@ -246,7 +250,7 @@ namespace Makaretu.Collections
         ///   When <paramref name="contact"/> is null or its <see cref="IContact.Id"/>
         ///   is null or empty.
         /// </exception>
-        void Validate(IContact contact)
+        void Validate(T contact)
         {
             if (contact == null)
                 throw new ArgumentNullException("contact");
@@ -254,7 +258,7 @@ namespace Makaretu.Collections
                 throw new ArgumentNullException("contact.Id");
         }
 
-        void _Add(IContact contact)
+        void _Add(T contact)
         {
             var bitIndex = 0;
             var node = root;
@@ -302,10 +306,10 @@ namespace Makaretu.Collections
         ///   node that was split as an inner node of the binary tree of nodes by
         ///   setting this.root.contacts = null
         /// </summary>
-        void _Split(Bucket node, int bitIndex)
+        void _Split(Bucket<T> node, int bitIndex)
         {
-            node.Left = new Bucket();
-            node.Right = new Bucket();
+            node.Left = new Bucket<T>();
+            node.Right = new Bucket<T>();
 
             // redistribute existing contacts amongst the two newly created nodes
             foreach (var contact in node.Contacts)
@@ -324,7 +328,7 @@ namespace Makaretu.Collections
             // TODO: otherNode.DontSplit = true;
         }
 
-        private void _Update(Bucket node, IContact contact)
+        private void _Update(Bucket<T> node, T contact)
         {
             // TODO
         }
@@ -335,7 +339,7 @@ namespace Makaretu.Collections
         /// <returns>
         ///   Left leaf if `id` at `bitIndex` is 0, right leaf otherwise
         /// </returns>
-        Bucket _DetermineNode(Bucket node, byte[]id, int bitIndex)
+        Bucket<T> _DetermineNode(Bucket<T> node, byte[]id, int bitIndex)
         {
 
             // id's that are too short are put in low bucket (1 byte = 8 bits)
@@ -377,7 +381,7 @@ namespace Makaretu.Collections
         /// <returns>
         ///   <b>null</b> or the found contact.
         /// </returns>
-        IContact _Get(byte[] id)
+        T _Get(byte[] id)
         {
             /*
              * If this is a leaf, loop through the bucket contents and return the correct
