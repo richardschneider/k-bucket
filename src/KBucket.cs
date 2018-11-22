@@ -135,7 +135,7 @@ namespace Makaretu.Collections
             rwlock.EnterReadLock();
             try
             {
-                return _get(item.Id) != null;
+                return _Get(item.Id) != null;
             }
             finally
             {
@@ -177,7 +177,7 @@ namespace Makaretu.Collections
             rwlock.EnterWriteLock();
             try
             {
-                return _remove(item.Id);
+                return _Remove(item.Id);
             }
             finally
             {
@@ -209,13 +209,13 @@ namespace Makaretu.Collections
                 // this is not a leaf node but an inner node with 'low' and 'high'
                 // branches; we will check the appropriate bit of the identifier and
                 // delegate to the appropriate node for further processing
-                node = _determineNode(node, contact.Id, bitIndex++);
+                node = _DetermineNode(node, contact.Id, bitIndex++);
             }
 
             // check if the contact already exists
             if (node.Contains(contact))
             {
-                _update(node, contact);
+                _Update(node, contact);
                 return;
             }
 
@@ -238,7 +238,7 @@ namespace Makaretu.Collections
                 return;
             }
 
-            _split(node, bitIndex);
+            _Split(node, bitIndex);
             _Add(contact);
         }
 
@@ -251,7 +251,7 @@ namespace Makaretu.Collections
            * @param  {Number} bitIndex the bitIndex to which byte to check in the
            *                           Uint8Array for navigating the binary tree
            */
-        void _split(Bucket node, int bitIndex)
+        void _Split(Bucket node, int bitIndex)
         {
             node.Left = new Bucket();
             node.Right = new Bucket();
@@ -259,7 +259,7 @@ namespace Makaretu.Collections
             // redistribute existing contacts amongst the two newly created nodes
             foreach (var contact in node.Contacts)
             {
-                _determineNode(node, contact.Id, bitIndex)
+                _DetermineNode(node, contact.Id, bitIndex)
                     .Contacts.Add(contact);
             }
 
@@ -268,12 +268,12 @@ namespace Makaretu.Collections
             // don't split the "far away" node
             // we check where the local node would end up and mark the other one as
             // "dontSplit" (i.e. "far away")
-            var detNode = _determineNode(node, LocalContactId, bitIndex);
+            var detNode = _DetermineNode(node, LocalContactId, bitIndex);
             var otherNode = node.Left == detNode ? node.Right : node.Left;
             // TODO: otherNode.DontSplit = true;
         }
 
-        private void _update(Bucket node, IContact contact)
+        private void _Update(Bucket node, IContact contact)
         {
             // TODO
         }
@@ -287,7 +287,7 @@ namespace Makaretu.Collections
         /// <returns>
         ///   Left leaf if `id` at `bitIndex` is 0, right leaf otherwise
         /// </returns>
-        Bucket _determineNode(Bucket node, byte[]id, int bitIndex)
+        Bucket _DetermineNode(Bucket node, byte[]id, int bitIndex)
         {
 
             // id's that are too short are put in low bucket (1 byte = 8 bits)
@@ -329,28 +329,28 @@ namespace Makaretu.Collections
    * @param  {Uint8Array} id The ID of the contact to fetch.
    * @return {Object|Null}   The contact if available, otherwise null
    */
-        IContact _get(byte[] id)
+        IContact _Get(byte[] id)
         {
             var bitIndex = 0;
 
             var node = root;
             while (node.Contacts == null)
             {
-                node = _determineNode(node, id, bitIndex++);
+                node = _DetermineNode(node, id, bitIndex++);
             }
 
             // index of uses contact id for matching
             return node.Get(id);
         }
 
-        bool _remove(byte[] id)
+        bool _Remove(byte[] id)
         {
             var bitIndex = 0;
 
             var node = root;
             while (node.Contacts == null)
             {
-                node = _determineNode(node, id, bitIndex++);
+                node = _DetermineNode(node, id, bitIndex++);
             }
 
             // index of uses contact id for matching
