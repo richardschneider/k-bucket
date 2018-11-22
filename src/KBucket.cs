@@ -219,6 +219,16 @@ namespace Makaretu.Collections
             return GetEnumerator();
         }
 
+        /// <summary>
+        ///   Check that contact is correct.
+        /// </summary>
+        /// <param name="contact">
+        ///   The <see cref="IContact"/> to validate.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   When <paramref name="contact"/> is null or its <see cref="IContact.Id"/>
+        ///   is null or empty.
+        /// </exception>
         void Validate(IContact contact)
         {
             if (contact == null)
@@ -270,15 +280,11 @@ namespace Makaretu.Collections
             _Add(contact);
         }
 
-        /**
-           * Splits the node, redistributes contacts to the new nodes, and marks the
-           * node that was split as an inner node of the binary tree of nodes by
-           * setting this.root.contacts = null
-           *
-           * @param  {Object} node     node for splitting
-           * @param  {Number} bitIndex the bitIndex to which byte to check in the
-           *                           Uint8Array for navigating the binary tree
-           */
+        /// <summary>
+        ///   Splits the node, redistributes contacts to the new nodes, and marks the
+        ///   node that was split as an inner node of the binary tree of nodes by
+        ///   setting this.root.contacts = null
+        /// </summary>
         void _Split(Bucket node, int bitIndex)
         {
             node.Left = new Bucket();
@@ -309,9 +315,6 @@ namespace Makaretu.Collections
         /// <summary>
         ///   Determines whether the id at the bitIndex is 0 or 1.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="id"></param>
-        /// <param name="bitIndex"></param>
         /// <returns>
         ///   Left leaf if `id` at `bitIndex` is 0, right leaf otherwise
         /// </returns>
@@ -348,26 +351,29 @@ namespace Makaretu.Collections
             return node.Left;
         }
 
-        /**
-   * Get a contact by its exact ID.
-   * If this is a leaf, loop through the bucket contents and return the correct
-   * contact if we have it or null if not. If this is an inner node, determine
-   * which branch of the tree to traverse and repeat.
-   *
-   * @param  {Uint8Array} id The ID of the contact to fetch.
-   * @return {Object|Null}   The contact if available, otherwise null
-   */
+        /// <summary>
+        ///   Get a contact by its exact ID. 
+        /// </summary>
+        /// <param name="id">
+        ///   The ID of a <see cref="IContact"/>.
+        /// </param>
+        /// <returns>
+        ///   <b>null</b> or the found contact.
+        /// </returns>
         IContact _Get(byte[] id)
         {
+            /*
+             * If this is a leaf, loop through the bucket contents and return the correct
+             * contact if we have it or null if not. If this is an inner node, determine
+             * which branch of the tree to traverse and repeat.
+             */
             var bitIndex = 0;
-
             var node = root;
             while (node.Contacts == null)
             {
                 node = _DetermineNode(node, id, bitIndex++);
             }
 
-            // index of uses contact id for matching
             return node.Get(id);
         }
 
