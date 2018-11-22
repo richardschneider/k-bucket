@@ -1,6 +1,6 @@
-# Rrlease
+# Release
 
-See the [release history](releases) for all changes.
+See the [release history](https://github.com/richardschneider/k-bucket/releases) for all changes.
 
 ## Policy
 
