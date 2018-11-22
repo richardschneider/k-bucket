@@ -6,9 +6,9 @@
 [![docs](https://cdn.rawgit.com/richardschneider/k-bucket/master/doc/images/docs-latest-green.svg)](https://richardschneider.github.io/k-bucket/articles/intro.html)
 
 A [Distributed Hash Table](http://en.wikipedia.org/wiki/Distributed_hash_table) (DHT) is a 
-decentralized distributed system that provides a lookup table similar to a hash table. 
+decentralised distributed system that provides a lookup table similar to a centralised hash table. 
 **k-bucket** is an implementation of a storage mechanism for keys within a DHT. It 
-manages `IContact` objects which represent locations and addresses of nodes in the system. 
+manages `IContact` objects which represent nodes in the distrubuted system. 
 `contact` objects have an ID, which is typically a SHA-1 hash.
 
 ## Getting started

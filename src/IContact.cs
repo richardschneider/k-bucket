@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 namespace Makaretu.Collections
 {
     /// <summary>
-    ///   A peer/node in the tree.
+    ///   A peer/node in the distributed system.
     /// </summary>
     public interface IContact
     {
         /// <summary>
-        ///   Unique identifier.
+        ///   Unique identifier of the contact.
         /// </summary>
         /// <value>
-        ///   Typically a hash of a name. 
+        ///   Typically a hash of a unique identifier. 
         /// </value>
         byte[] Id { get; }
     }
