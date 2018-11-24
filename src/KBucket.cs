@@ -33,6 +33,16 @@ namespace Makaretu.Collections
         public int ContactsPerBucket { get; set; } = 20;
 
         /// <summary>
+        ///   The number of contacts to ping when a bucket that should not be split
+        ///   becomes full.
+        /// </summary>
+        /// <value>
+        ///   Defaults to 3.
+        /// </value>
+        /// <seealso cref="Ping"/>
+        public int ContactsToPing { get; set; } = 3;
+
+        /// <summary>
         ///   The ID of the local contact/peer.
         /// </summary>
         /// <value>
@@ -53,6 +63,11 @@ namespace Makaretu.Collections
                 localContactId = value;
             }
         }
+
+        /// <summary>
+        ///   Raised when a bucket needs splitting but cannot be split.
+        /// </summary>
+        public event EventHandler<PingEventArgs<T>> Ping;
 
         /// <summary>
         ///   Determines which contact is used when both have the same ID.
@@ -323,7 +338,11 @@ namespace Makaretu.Collections
                 // only if one of the pinged nodes does not respond, can the new contact
                 // be added (this prevents DoS flodding with new invalid contacts)
 
-                // TODO: this.emit('ping', node.contacts.slice(0, this.numberOfNodesToPing), contact)
+                Ping?.Invoke(this, new PingEventArgs<T>
+                {
+                    Checks = node.Contacts.Take(ContactsToPing).ToArray(),
+                    Contact = contact
+                });
                 return;
             }
 
