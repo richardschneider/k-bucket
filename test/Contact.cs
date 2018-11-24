@@ -31,5 +31,7 @@ namespace Makaretu.Collections
 
         public byte[] Id { get; set; }
 
+        public int Clock { get; set; }
+
     }
 }

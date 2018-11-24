@@ -55,6 +55,35 @@ namespace Makaretu.Collections
         }
 
         /// <summary>
+        ///   Determines which contact is used when both have the same ID.
+        /// </summary>
+        /// <value>
+        ///   Defaults to <see cref="DefaultAbiter(T, T)"/>.
+        /// </value>
+        /// <remarks>
+        ///   The arguments are the incumbent and the candidate.
+        /// </remarks>
+        public Func<T, T, T> Arbiter { get; set; } = DefaultAbiter;
+
+        /// <summary>
+        ///   Used to determine which contact should be use when both
+        ///   have the same ID.
+        /// </summary>
+        /// <param name="incumbent">
+        ///   The existing contact.
+        /// </param>
+        /// <param name="candidate">
+        ///   The new contact.
+        /// </param>
+        /// <returns>
+        ///   Always returns the <paramref name="incumbent"/>.
+        /// </returns>
+        public static T DefaultAbiter (T incumbent, T candidate)
+        {
+            return incumbent;
+        }
+
+        /// <summary>
         ///   Finds the XOR distance between the two contacts.
         /// </summary>
         public int Distance(T a, T b)
@@ -272,9 +301,10 @@ namespace Makaretu.Collections
             }
 
             // check if the contact already exists
-            if (node.Contains(contact))
+            var index = node.IndexOf(contact.Id);
+            if (0 <= index)
             {
-                _Update(node, contact);
+                _Update(node, index, contact);
                 return;
             }
 
@@ -328,9 +358,34 @@ namespace Makaretu.Collections
             // TODO: otherNode.DontSplit = true;
         }
 
-        private void _Update(Bucket<T> node, T contact)
+        /// <summary>
+        ///   Updates the contact selected by the arbiter.
+        /// </summary>
+        /// <remarks>
+        ///   If the selection is our old contact and the candidate is some new contact
+        ///   then the new contact is abandoned (not added).
+        ///
+        ///   If the selection is our old contact and the candidate is our old contact
+        ///   then we are refreshing the contact and it is marked as most recently
+        ///   contacted(by being moved to the right/end of the bucket array).
+        ///   
+        ///   If the selection is our new contact, the old contact is removed and the new
+        ///   contact is marked as most recently contacted.
+        /// </remarks>
+        void _Update(Bucket<T> node, int index, T contact)
         {
-            // TODO
+            var incumbent = node.Contacts[index];
+            var selection = Arbiter(incumbent, contact);
+
+            // if the selection is our old contact and the candidate is some new
+            // contact, then there is nothing to do
+            if (selection == incumbent && incumbent != contact)
+            {
+                return;
+            }
+
+            node.Contacts.RemoveAt(index);
+            node.Contacts.Add(selection);
         }
 
         /// <summary>
