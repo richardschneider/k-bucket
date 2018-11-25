@@ -136,7 +136,7 @@ namespace Makaretu.Collections
         public void Enumerate()
         {
             var bucket = new KBucket<Contact>();
-            var nContacts = 4000;
+            var nContacts = bucket.ContactsPerBucket + 1;
             for (var i = 0; i < nContacts; ++i)
             {
                 bucket.Add(new Contact(i));
@@ -171,8 +171,6 @@ namespace Makaretu.Collections
                 tasks[i] = Task.Run(() => AddTask(bucket, start, nContacts));
             }
             await Task.WhenAll(tasks);
-
-            Assert.AreEqual(nTasks * nContacts, bucket.Count);
         }
 
         public void AddTask(KBucket<Contact> bucket, int start, int count)

@@ -20,7 +20,6 @@ namespace Makaretu.Collections
     public class KBucket<T> : ICollection<T>
         where T: class, IContact
     {
-        Bucket<T> root = new Bucket<T>();
         readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         byte[] localContactId;
 
@@ -63,6 +62,11 @@ namespace Makaretu.Collections
                 localContactId = value;
             }
         }
+
+        /// <summary>
+        ///   The root of the binary tree.
+        /// </summary>
+        public Bucket<T> Root { get; private set; } = new Bucket<T>();
 
         /// <summary>
         ///   Raised when a bucket needs splitting but cannot be split.
@@ -165,7 +169,7 @@ namespace Makaretu.Collections
         }
 
         /// <inheritdoc />
-        public int Count => root.DeepCount();
+        public int Count => Root.DeepCount();
 
         /// <inheritdoc />
         public bool IsReadOnly => false;
@@ -189,7 +193,7 @@ namespace Makaretu.Collections
         /// <inheritdoc />
         public void Clear()
         {
-            root = new Bucket<T>();
+            Root = new Bucket<T>();
         }
 
         /// <inheritdoc />
@@ -251,7 +255,7 @@ namespace Makaretu.Collections
             rwlock.EnterReadLock();
             try
             {
-                foreach (var contact in root.AllContacts())
+                foreach (var contact in Root.AllContacts())
                 {
                     yield return contact;
                 }
@@ -305,7 +309,7 @@ namespace Makaretu.Collections
         void _Add(T contact)
         {
             var bitIndex = 0;
-            var node = root;
+            var node = Root;
 
             while (node.Contacts == null)
             {
@@ -374,7 +378,7 @@ namespace Makaretu.Collections
             // "dontSplit" (i.e. "far away")
             var detNode = _DetermineNode(node, LocalContactId, bitIndex);
             var otherNode = node.Left == detNode ? node.Right : node.Left;
-            // TODO: otherNode.DontSplit = true;
+            otherNode.DontSplit = true;
         }
 
         /// <summary>
@@ -467,7 +471,7 @@ namespace Makaretu.Collections
              * which branch of the tree to traverse and repeat.
              */
             var bitIndex = 0;
-            var node = root;
+            var node = Root;
             while (node.Contacts == null)
             {
                 node = _DetermineNode(node, id, bitIndex++);
@@ -480,7 +484,7 @@ namespace Makaretu.Collections
         {
             var bitIndex = 0;
 
-            var node = root;
+            var node = Root;
             while (node.Contacts == null)
             {
                 node = _DetermineNode(node, id, bitIndex++);
