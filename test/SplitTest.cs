@@ -112,7 +112,12 @@ namespace Makaretu.Collections
                 LocalContactId = new byte[] { 0x00 }
             };
             int pings = 0;
-            kBucket.Ping += (s, e) => ++pings;
+            kBucket.Ping += (s, e) =>
+            {
+                kBucket.Remove(e.Oldest.First());
+                kBucket.Add(e.Newest);
+                ++pings;
+            };
             
             for (var i = 0; i < 0x255; ++i)
             {

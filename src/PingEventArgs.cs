@@ -16,11 +16,11 @@ namespace Makaretu.Collections
         /// <summary>
         ///   The contacts that should be checked.
         /// </summary>
-        public IEnumerable<T> Checks;
+        public IEnumerable<T> Oldest;
 
         /// <summary>
         ///   A new contact that wants to be added.
         /// </summary>
-        public T Contact;
+        public T Newest;
     }
 }

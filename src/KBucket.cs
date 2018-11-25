@@ -178,15 +178,22 @@ namespace Makaretu.Collections
         public void Add(T item)
         {
             Validate(item);
-
+            bool q;
+            PingEventArgs<T> e;
             rwlock.EnterWriteLock();
             try
             {
-                _Add(item);
+                q = _Add(item, out e);
             }
             finally
             {
                 rwlock.ExitWriteLock();
+            }
+
+            // Could not add.  Ping oldest contacts.
+            if (!q)
+            {
+                Ping?.Invoke(this, e);
             }
         }
 
@@ -306,8 +313,19 @@ namespace Makaretu.Collections
                 throw new ArgumentNullException("contact.Id");
         }
 
-        void _Add(T contact)
+        /// <summary>
+        ///   Add the contact.
+        /// </summary>
+        /// <param name="contact"></param>
+        /// <param name="p"></param>
+        /// <returns>
+        ///   <b>true</b> if the <paramref name="contact"/> was added; otherwise, 
+        ///   <b>false</b> and a <see cref="Ping"/> event should be raised.
+        /// </returns>
+        bool _Add(T contact, out PingEventArgs<T> ping)
         {
+            ping = null;
+
             var bitIndex = 0;
             var node = Root;
 
@@ -324,13 +342,13 @@ namespace Makaretu.Collections
             if (0 <= index)
             {
                 _Update(node, index, contact);
-                return;
+                return  true;
             }
 
             if (node.Contacts.Count < ContactsPerBucket)
             {
                 node.Contacts.Add(contact);
-                return;
+                return true;
             }
 
             // the bucket is full
@@ -342,16 +360,16 @@ namespace Makaretu.Collections
                 // only if one of the pinged nodes does not respond, can the new contact
                 // be added (this prevents DoS flodding with new invalid contacts)
 
-                Ping?.Invoke(this, new PingEventArgs<T>
+                ping = new PingEventArgs<T>
                 {
-                    Checks = node.Contacts.Take(ContactsToPing).ToArray(),
-                    Contact = contact
-                });
-                return;
+                    Oldest = node.Contacts.Take(ContactsToPing).ToArray(),
+                    Newest = contact
+                };
+                return false;
             }
 
             _Split(node, bitIndex);
-            _Add(contact);
+            return _Add(contact, out ping);
         }
 
         /// <summary>
