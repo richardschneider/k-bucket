@@ -103,5 +103,22 @@ namespace Makaretu.Collections
                 Assert.AreEqual(dontSplit, node.DontSplit);
             }
         }
+
+        [TestMethod]
+        public void PingEvent()
+        {
+            var kBucket = new KBucket<Contact>
+            {
+                LocalContactId = new byte[] { 0x00 }
+            };
+            int pings = 0;
+            kBucket.Ping += (s, e) => ++pings;
+            
+            for (var i = 0; i < 0x255; ++i)
+            {
+                kBucket.Add(new Contact((byte)i));
+            }
+            Assert.AreNotEqual(0, pings);
+        }
     }
 }
