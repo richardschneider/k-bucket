@@ -413,7 +413,11 @@ namespace Makaretu.Collections
         /// <returns>
         ///   Left leaf if `id` at `bitIndex` is 0, right leaf otherwise
         /// </returns>
-        Bucket<T> _DetermineNode(Bucket<T> node, byte[]id, int bitIndex)
+        /// <remarks>
+        ///   This is an internal method.  It should not be directly called.
+        ///   It is only public for unit testing.
+        /// </remarks>
+        public Bucket<T> _DetermineNode(Bucket<T> node, byte[]id, int bitIndex)
         {
 
             // id's that are too short are put in low bucket (1 byte = 8 bits)
