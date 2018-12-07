@@ -17,8 +17,10 @@ namespace Makaretu.Collections
         [TestMethod]
         public void OneContactDoesNotSplit()
         {
-            var kBucket = new KBucket<Contact>();
-            kBucket.Add(new Contact("a"));
+            var kBucket = new KBucket<Contact>
+            {
+                new Contact("a")
+            };
             Assert.IsNull(kBucket.Root.Left);
             Assert.IsNull(kBucket.Root.Right);
             Assert.IsNotNull(kBucket.Root.Contacts);
@@ -88,15 +90,15 @@ namespace Makaretu.Collections
             // since localNodeId is 0x00, we expect every right node to be "far" and
             // therefore marked as "dontSplit = true"
             // there will be one "left" node and four "right" nodes (t.expect(5)) 
-            traverse(kBucket.Root, false);
+            Traverse(kBucket.Root, false);
         }
 
-        void traverse (Bucket<Contact> node, bool dontSplit)
+        void Traverse (Bucket<Contact> node, bool dontSplit)
         {
             if (node.Contacts == null)
             {
-                traverse(node.Left, false);
-                traverse(node.Right, true);
+                Traverse(node.Left, false);
+                Traverse(node.Right, true);
             }
             else
             {

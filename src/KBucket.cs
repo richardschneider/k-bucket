@@ -318,7 +318,7 @@ namespace Makaretu.Collections
         ///   Add the contact.
         /// </summary>
         /// <param name="contact"></param>
-        /// <param name="p"></param>
+        /// <param name="ping"></param>
         /// <returns>
         ///   <b>true</b> if the <paramref name="contact"/> was added; otherwise, 
         ///   <b>false</b> and a <see cref="Ping"/> event should be raised.
