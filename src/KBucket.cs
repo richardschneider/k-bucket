@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -105,7 +106,7 @@ namespace Makaretu.Collections
         /// <summary>
         ///   Finds the XOR distance between the two contacts.
         /// </summary>
-        public int Distance(T a, T b)
+        public BigInteger Distance(T a, T b)
         {
             Validate(a);
             Validate(b);
@@ -115,9 +116,9 @@ namespace Makaretu.Collections
         /// <summary>
         ///   Finds the XOR distance between the two contact IDs.
         /// </summary>
-        public int Distance(byte[] a, byte[] b)
+        public BigInteger Distance(byte[] a, byte[] b)
         {
-            var distance = 0;
+            BigInteger distance = 0;
             var i = 0;
             var min = Math.Min(a.Length, b.Length);
             var max = Math.Max(a.Length, b.Length);
